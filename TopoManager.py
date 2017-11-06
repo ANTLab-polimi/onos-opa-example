@@ -33,7 +33,8 @@ class TopoManager(object):
         if 'hosts' not in reply:
             return
         for host in reply['hosts']:
-            hostname = TopoManager.multi_ip_hostname(host['ipAddresses']) if host['ipAddresses'] != [] else host['id']
+            # hostname = TopoManager.multi_ip_hostname(host['ipAddresses']) if host['ipAddresses'] != [] else host['id']
+            hostname = host['id']
             self.G.add_node(hostname, type='host')
             n1 = hostname
             for location in host['locations']:
@@ -63,3 +64,6 @@ class TopoManager(object):
                                 labels=self.device_id_to_chassisid)
         nx.draw_networkx_edges(self.G, self.pos)
         plt.show(block=block)
+
+    def shortestPath(self, from_el, to_el):
+        return nx.shortest_path(self.G, from_el, to_el)
