@@ -14,18 +14,22 @@ class IMRManager ():
         if 'response' not in reply:
             return
         for intent in reply['response']:
-            print intent
+            key = intent['key']
+            del intent['key']
+            self.intents[key] = intent
 
-            self.intents[intent['key']] = (intent['inElement'], intent['outElement'])
 
 
     def reRouteMonitoredIntents(self):
         reRouting = {"routingList" : []}
         i = 0
-        for (key, endPoints) in self.intents.items():
-            path = self.topology.shortestPath(endPoints[0], endPoints[1])
+        for (key, intent) in self.intents.items():
+            path = self.topology.shortestPath(intent['inElement'], intent['outElement'])
             current_reroute = {}
             current_reroute["key"] = key
+            current_reroute["appId"] = {}
+            current_reroute["appId"]["id"] = intent["appId"]
+            current_reroute["appId"]["name"] = intent['appName']
             current_reroute["paths"] = []
             current_reroute["paths"].append({})
             current_reroute["paths"][0]["path"] = path
