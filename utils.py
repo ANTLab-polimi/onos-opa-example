@@ -38,3 +38,7 @@ def json_post_req(url, json_data):
 def intent_stats():
     reply = json_get_req('http://%s:%d/onos/v1/imr/intentStats' % (ONOS_IP, ONOS_PORT))
     return reply['response'] if 'response' in reply else []
+
+
+def avg(l):
+    return 1.0*sum(l)/len(l)
