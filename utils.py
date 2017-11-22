@@ -33,3 +33,17 @@ def json_post_req(url, json_data):
     except IOError as e:
         logging.error(e)
         return ''
+
+def bps_to_human_string(num, Bps=False):
+    if Bps:
+        # convert bit per sec to byte per sec
+        num = num/8.0
+        suffix = 'B/s'
+    else:
+        suffix = 'bps'
+
+    for unit in ['', 'K', 'M', 'G']:
+        if abs(num) < 1000.0:
+            return "%3.1f %s%s" % (num, unit, suffix)
+        num /= 1000.0
+    return "%.1f %s%s" % (num, 'T', suffix)

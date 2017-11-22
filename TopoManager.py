@@ -30,7 +30,7 @@ class TopoManager(object):
                     bw = int(link['annotations']['bandwidth']) * 1e6
             else:
                 bw = DEFAULT_CAPACITY
-            self.G.add_edge(n1, n2, {'bandwidth': bw})
+            self.G.add_edge(n1, n2, **{'bandwidth': bw})
 
         reply = json_get_req("http://%s:%d/onos/v1/hosts" % (ONOS_IP, ONOS_PORT))
         if 'hosts' not in reply:
@@ -38,7 +38,7 @@ class TopoManager(object):
         for host in reply['hosts']:
             self.G.add_node(host['id'], type='host')
             for location in host['locations']:
-                self.G.add_edge(host['id'], location['elementId'],  {'bandwidth': DEFAULT_ACCESS_CAPACITY})
+                self.G.add_edge(host['id'], location['elementId'],  **{'bandwidth': DEFAULT_ACCESS_CAPACITY})
             self.hosts.append(host['id'])
 
         self.pos = nx.fruchterman_reingold_layout(self.G)

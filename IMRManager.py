@@ -2,7 +2,7 @@ import json
 import operator
 import networkx as nx
 from config import ONOS_IP, ONOS_PORT
-from utils import json_get_req, json_post_req
+from utils import json_get_req, json_post_req, bps_to_human_string
 from StatsManager import StatsManager
 
 
@@ -14,8 +14,11 @@ class IMRManager(object):
         reply = json_get_req("http://%s:%d/onos/v1/imr/monitoredIntents" % (ONOS_IP, ONOS_PORT))
         if 'response' not in reply:
             return
-        for intent in reply['response']:
-            self.intentKey_to_inOutElements[StatsManager.flow_id(intent)] = (intent['inElement'], intent['outElement'])
+        for apps in reply['response']:
+            for intent in apps["intents"]:
+                print intent
+                flow_id = (intent["key"], apps["id"], apps["name"])
+                self.intentKey_to_inOutElements[flow_id] = (intent['inElement'], intent['outElement'])
 
     def monitoredIntents(self):
         return set(self.intentKey_to_inOutElements.keys())
@@ -24,11 +27,11 @@ class IMRManager(object):
         reroute_msg = {"routingList": []}
 
         topo = self.topo.G.copy()
-        
+
         # for each flow (sorted by amount, in decreasing order)
         for flow_id, amount in sorted(worst_TM.items(), key=operator.itemgetter(1), reverse=True):
             dem = self.intentKey_to_inOutElements[flow_id]
-            print '\nTrying to route %d bps for demand %s -> %s' % (amount, dem[0], dem[1])
+            print '\nTrying to route %s for demand %s -> %s' % (bps_to_human_string(amount), dem[0], dem[1])
             # compute the shortest path on the residual graph
             reduced_topo = self.reduced_capacity_topo(topo, amount)
             try:
