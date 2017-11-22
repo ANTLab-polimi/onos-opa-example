@@ -1,7 +1,7 @@
-import urllib2
-import json
 import base64
+import json
 import logging
+import urllib2
 from config import *
 
 logging.basicConfig(level=logging.INFO, format='[%(asctime)s] %(message)s')
@@ -33,12 +33,3 @@ def json_post_req(url, json_data):
     except IOError as e:
         logging.error(e)
         return ''
-
-
-def intent_stats():
-    reply = json_get_req('http://%s:%d/onos/v1/imr/intentStats' % (ONOS_IP, ONOS_PORT))
-    return reply['response'] if 'response' in reply else []
-
-
-def avg(l):
-    return 1.0*sum(l)/len(l)
