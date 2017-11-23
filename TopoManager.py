@@ -11,7 +11,7 @@ class TopoManager(object):
         self.devices = []
         self.deviceId_to_chassisId = {}
 
-        reply = json_get_req("http://%s:%d/onos/v1/devices" % (ONOS_IP, ONOS_PORT))
+        reply = json_get_req('http://%s:%d/onos/v1/devices' % (ONOS_IP, ONOS_PORT))
         if 'devices' not in reply:
             return
         for dev in reply['devices']:
@@ -20,7 +20,7 @@ class TopoManager(object):
             self.G.add_node(dev['id'], type='device')
             self.devices.append(dev['id'])
 
-        reply = json_get_req("http://%s:%d/onos/v1/links" % (ONOS_IP, ONOS_PORT))
+        reply = json_get_req('http://%s:%d/onos/v1/links' % (ONOS_IP, ONOS_PORT))
         if 'links' not in reply:
             return
         for link in reply['links']:
@@ -32,7 +32,7 @@ class TopoManager(object):
                 bw = DEFAULT_CAPACITY
             self.G.add_edge(n1, n2, **{'bandwidth': bw})
 
-        reply = json_get_req("http://%s:%d/onos/v1/hosts" % (ONOS_IP, ONOS_PORT))
+        reply = json_get_req('http://%s:%d/onos/v1/hosts' % (ONOS_IP, ONOS_PORT))
         if 'hosts' not in reply:
             return
         for host in reply['hosts']:

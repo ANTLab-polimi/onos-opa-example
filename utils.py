@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.INFO, format='[%(asctime)s] %(message)s')
 def authenticated_http_req(url, user, pwd):
     request = urllib2.Request(url)
     base64string = base64.encodestring('%s:%s' % (user, pwd)).replace('\n', '')
-    request.add_header("Authorization", "Basic %s" % base64string)
+    request.add_header('Authorization', 'Basic %s' % base64string)
     return request
 
 
@@ -34,16 +34,16 @@ def json_post_req(url, json_data):
         logging.error(e)
         return ''
 
-def bps_to_human_string(num, Bps=False):
-    if Bps:
-        # convert bit per sec to byte per sec
-        num = num/8.0
+
+def bps_to_human_string(value, to_byte_per_second=False):
+    if to_byte_per_second:
+        value = value/8.0
         suffix = 'B/s'
     else:
         suffix = 'bps'
 
     for unit in ['', 'K', 'M', 'G']:
-        if abs(num) < 1000.0:
-            return "%3.1f %s%s" % (num, unit, suffix)
-        num /= 1000.0
-    return "%.1f %s%s" % (num, 'T', suffix)
+        if abs(value) < 1000.0:
+            return '%3.1f %s%s' % (value, unit, suffix)
+        value /= 1000.0
+    return '%.1f %s%s' % (value, 'T', suffix)
