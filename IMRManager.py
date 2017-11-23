@@ -16,7 +16,10 @@ class IMRManager(object):
             for intent in apps['intents']:
                 print intent
                 flow_id = (intent['key'], apps['id'], apps['name'])
-                self.intentKey_to_inOutElements[flow_id] = (intent['inElement'], intent['outElement'])
+                if len(intent['inElements']) == 1 and len(intent['outElements']) == 1:
+                    self.intentKey_to_inOutElements[flow_id] = (intent['inElements'][0], intent['outElements'][0])
+                else:
+                    print 'Intent with multiple inElements/outElements are not currently supported :('
 
     def get_monitored_intents(self):
         return set(self.intentKey_to_inOutElements.keys())
@@ -70,17 +73,7 @@ def reduced_capacity_topo(topo, amount):
     return reduced_topo
 
 
-class FakeIMRManager(IMRManager):
-    def __init__(self, topo):
-        self.intentKey_to_inOutElements = {}
-        self.topo = topo
-
-        reply = {'response': [{'key': 'key1', 'appId': 0, 'appName': 'testApp',
-                               'inElement': u'00:00:00:00:00:01/None', 'outElement': u'00:00:00:00:00:08/None'},
-                              {'key': 'key2', 'appId': 0, 'appName': 'testApp',
-                               'inElement': u'00:00:00:00:00:08/None', 'outElement': u'00:00:00:00:00:01/None'}]}
-
-        if 'response' not in reply:
-            return
-        for intent in reply['response']:
-            self.intentKey_to_inOutElements[intent['key']] = (intent['inElement'], intent['outElement'])
+'''
+http://onosvm.local:8181/onos/v1/imr/monitoredIntents
+{"response":[{"id":71,"name":"org.onosproject.ifwd","intents":[{"key":"00:00:00:00:00:08/None00:00:00:00:00:01/None","inElements":["00:00:00:00:00:08/None"],"outElements":["00:00:00:00:00:01/None"]},{"key":"00:00:00:00:00:01/None00:00:00:00:00:08/None","inElements":["00:00:00:00:00:01/None"],"outElements":["00:00:00:00:00:08/None"]}]}]}
+'''
