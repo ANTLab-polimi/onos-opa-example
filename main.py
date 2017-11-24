@@ -5,6 +5,7 @@ from StatsManager import StatsManager
 from TopoManager import TopoManager
 from config import POLLING_INTERVAL, TM_TRAINING_SET_SIZE
 from utils import bps_to_human_string
+from pprint import pprint
 
 '''
 from IMRManager import FakeIMRManager as IMRManager
@@ -20,7 +21,7 @@ topo = TopoManager()
 
 statsManager = StatsManager()
 while len(statsManager.get_tm_store()) <= TM_TRAINING_SET_SIZE:
-    print 'Polling Intent stats...'
+    print '\nPolling Intent stats...'
     threading.Thread(target=statsManager.poll_stats).start()
     time.sleep(POLLING_INTERVAL)
 
@@ -34,5 +35,6 @@ if set(sum([tm.keys() for tm in statsManager.get_tm_store()], [])) != imrManager
 worst_tm = {intentKey: max([tm[intentKey] if intentKey in tm else 0 for tm in statsManager.get_tm_store()])
             for intentKey in imrManager.get_monitored_intents()}
 
-print 'worst_tm', {flow_id: bps_to_human_string(worst_tm[flow_id]) for flow_id in worst_tm}
+print 'worst_tm'
+pprint({flow_id: bps_to_human_string(worst_tm[flow_id]) for flow_id in worst_tm})
 imrManager.reroute_monitored_intents(worst_tm)

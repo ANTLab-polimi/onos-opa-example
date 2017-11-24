@@ -2,6 +2,7 @@ import json
 import networkx as nx
 from config import ONOS_IP, ONOS_PORT
 from utils import json_get_req, json_post_req, bps_to_human_string
+from pprint import pprint
 
 
 class IMRManager(object):
@@ -48,8 +49,8 @@ class IMRManager(object):
             except nx.NetworkXNoPath:
                 print 'No path found'
 
-        print 'reroute_msg config:'
-        print reroute_msg
+        print '\nreroute_msg config:'
+        pprint(reroute_msg)
         json_post_req(('http://%s:%d/onos/v1/imr/reRouteIntents' % (ONOS_IP, ONOS_PORT)), json.dumps(reroute_msg))
 
 

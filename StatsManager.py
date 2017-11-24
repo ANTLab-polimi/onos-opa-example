@@ -1,5 +1,6 @@
 from config import *
 from utils import json_get_req
+from pprint import pprint
 
 
 class StatsManager(object):
@@ -36,7 +37,7 @@ class StatsManager(object):
             self.last_stat[flow_id] = stat
 
         self.tm_store.append(tm)
-        print tm
+        pprint(tm)
 
     def poll_stats(self):
         reply = json_get_req('http://%s:%d/onos/v1/imr/intentStats' % (ONOS_IP, ONOS_PORT))
