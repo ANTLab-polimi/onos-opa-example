@@ -2,15 +2,20 @@ import matplotlib.pyplot as plt
 import networkx as nx
 from config import *
 from utils import json_get_req
+import logging
 
 
 class TopoManager(object):
     def __init__(self):
         self.G = nx.Graph()
+        self.pos = None
         self.hosts = []
         self.devices = []
         self.deviceId_to_chassisId = {}
+        self.retrieve_topo_from_ONOS()
 
+    def retrieve_topo_from_ONOS(self):
+        logging.info("Retrieving Topology...")
         reply = json_get_req('http://%s:%d/onos/v1/devices' % (ONOS_IP, ONOS_PORT))
         if 'devices' not in reply:
             return
@@ -52,19 +57,3 @@ class TopoManager(object):
                                 labels=self.deviceId_to_chassisId)
         nx.draw_networkx_edges(self.G, self.pos)
         plt.show(block=block)
-
-
-class FakeTopoManager(TopoManager):
-    def __init__(self):
-        super(FakeTopoManager, self).__init__()
-
-'''
-http://onosvm.local:8181/onos/v1/devices
-{"devices":[{"id":"of:000000000000000c","type":"SWITCH","available":true,"role":"MASTER","mfr":"Nicira, Inc.","hw":"Open vSwitch","sw":"2.5.2","serial":"None","driver":"ovs","chassisId":"c","annotations":{"managementAddress":"127.0.0.1","protocol":"OF_13","channelId":"127.0.0.1:58268"}},{"id":"of:000000000000000d","type":"SWITCH","available":true,"role":"MASTER","mfr":"Nicira, Inc.","hw":"Open vSwitch","sw":"2.5.2","serial":"None","driver":"ovs","chassisId":"d","annotations":{"managementAddress":"127.0.0.1","protocol":"OF_13","channelId":"127.0.0.1:58272"}},{"id":"of:000000000000000b","type":"SWITCH","available":true,"role":"MASTER","mfr":"Nicira, Inc.","hw":"Open vSwitch","sw":"2.5.2","serial":"None","driver":"ovs","chassisId":"b","annotations":{"managementAddress":"127.0.0.1","protocol":"OF_13","channelId":"127.0.0.1:58262"}},{"id":"of:000000000000000e","type":"SWITCH","available":true,"role":"MASTER","mfr":"Nicira, Inc.","hw":"Open vSwitch","sw":"2.5.2","serial":"None","driver":"ovs","chassisId":"e","annotations":{"managementAddress":"127.0.0.1","protocol":"OF_13","channelId":"127.0.0.1:58266"}},{"id":"of:0000000000000001","type":"SWITCH","available":true,"role":"MASTER","mfr":"Nicira, Inc.","hw":"Open vSwitch","sw":"2.5.2","serial":"None","driver":"ovs","chassisId":"1","annotations":{"managementAddress":"127.0.0.1","protocol":"OF_13","channelId":"127.0.0.1:58264"}},{"id":"of:0000000000000002","type":"SWITCH","available":true,"role":"MASTER","mfr":"Nicira, Inc.","hw":"Open vSwitch","sw":"2.5.2","serial":"None","driver":"ovs","chassisId":"2","annotations":{"managementAddress":"127.0.0.1","protocol":"OF_13","channelId":"127.0.0.1:58270"}}]}
-
-http://onosvm.local:8181/onos/v1/links
-{"links":[{"src":{"port":"1","device":"of:000000000000000d"},"dst":{"port":"4","device":"of:0000000000000001"},"type":"DIRECT","state":"ACTIVE"},{"src":{"port":"2","device":"of:000000000000000e"},"dst":{"port":"5","device":"of:0000000000000002"},"type":"DIRECT","state":"ACTIVE"},{"src":{"port":"1","device":"of:000000000000000b"},"dst":{"port":"2","device":"of:0000000000000001"},"type":"DIRECT","state":"ACTIVE"},{"src":{"port":"2","device":"of:000000000000000c"},"dst":{"port":"3","device":"of:0000000000000002"},"type":"DIRECT","state":"ACTIVE"},{"src":{"port":"2","device":"of:0000000000000002"},"dst":{"port":"2","device":"of:000000000000000b"},"type":"DIRECT","state":"ACTIVE"},{"src":{"port":"4","device":"of:0000000000000002"},"dst":{"port":"2","device":"of:000000000000000d"},"type":"DIRECT","state":"ACTIVE"},{"src":{"port":"3","device":"of:0000000000000001"},"dst":{"port":"1","device":"of:000000000000000c"},"type":"DIRECT","state":"ACTIVE"},{"src":{"port":"5","device":"of:0000000000000001"},"dst":{"port":"1","device":"of:000000000000000e"},"type":"DIRECT","state":"ACTIVE"},{"src":{"port":"1","device":"of:0000000000000002"},"dst":{"port":"1","device":"of:0000000000000001"},"type":"DIRECT","state":"ACTIVE"},{"src":{"port":"1","device":"of:000000000000000e"},"dst":{"port":"5","device":"of:0000000000000001"},"type":"DIRECT","state":"ACTIVE"},{"src":{"port":"2","device":"of:000000000000000d"},"dst":{"port":"4","device":"of:0000000000000002"},"type":"DIRECT","state":"ACTIVE"},{"src":{"port":"1","device":"of:000000000000000c"},"dst":{"port":"3","device":"of:0000000000000001"},"type":"DIRECT","state":"ACTIVE"},{"src":{"port":"2","device":"of:000000000000000b"},"dst":{"port":"2","device":"of:0000000000000002"},"type":"DIRECT","state":"ACTIVE"},{"src":{"port":"1","device":"of:0000000000000001"},"dst":{"port":"1","device":"of:0000000000000002"},"type":"DIRECT","state":"ACTIVE"},{"src":{"port":"2","device":"of:0000000000000001"},"dst":{"port":"1","device":"of:000000000000000b"},"type":"DIRECT","state":"ACTIVE"},{"src":{"port":"3","device":"of:0000000000000002"},"dst":{"port":"2","device":"of:000000000000000c"},"type":"DIRECT","state":"ACTIVE"},{"src":{"port":"5","device":"of:0000000000000002"},"dst":{"port":"2","device":"of:000000000000000e"},"type":"DIRECT","state":"ACTIVE"},{"src":{"port":"4","device":"of:0000000000000001"},"dst":{"port":"1","device":"of:000000000000000d"},"type":"DIRECT","state":"ACTIVE"}]}
-
-http://onosvm.local:8181/onos/v1/hosts
-{"hosts":[{"id":"00:00:00:00:00:01/None","mac":"00:00:00:00:00:01","vlan":"None","configured":false,"ipAddresses":["10.0.0.1"],"locations":[{"elementId":"of:000000000000000b","port":"3"}]},{"id":"00:00:00:00:00:08/None","mac":"00:00:00:00:00:08","vlan":"None","configured":false,"ipAddresses":["10.0.0.8"],"locations":[{"elementId":"of:000000000000000c","port":"4"}]}]}
-'''
