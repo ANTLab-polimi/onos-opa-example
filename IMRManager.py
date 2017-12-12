@@ -14,7 +14,7 @@ class IMRManager(object):
 
     def retrieve_monitored_intents_from_ONOS(self):
         logging.info("Retrieving Monitored Intents...")
-        reply = json_get_req('http://%s:%d/onos/v1/imr/monitoredIntents' % (ONOS_IP, ONOS_PORT))
+        reply = json_get_req('http://%s:%d/onos/v1/imr/imr/monitoredIntents' % (ONOS_IP, ONOS_PORT))
         if 'response' not in reply:
             return
         for apps in reply['response']:
@@ -61,7 +61,7 @@ class IMRManager(object):
         if self.verbose:
             logging.info('reroute_msg config:')
             pprint(reroute_msg)
-        json_post_req(('http://%s:%d/onos/v1/imr/reRouteIntents' % (ONOS_IP, ONOS_PORT)), json.dumps(reroute_msg))
+        json_post_req(('http://%s:%d/onos/v1/imr/imr/reRouteIntents' % (ONOS_IP, ONOS_PORT)), json.dumps(reroute_msg))
 
 
 def reduced_capacity_on_path(topo, amount, path):

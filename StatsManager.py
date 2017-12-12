@@ -49,7 +49,7 @@ class StatsManager(object):
 
     def poll_stats(self):
         logging.info("Polling Traffic Matrices...")
-        reply = json_get_req('http://%s:%d/onos/v1/imr/intentStats' % (ONOS_IP, ONOS_PORT))
+        reply = json_get_req('http://%s:%d/onos/v1/imr/imr/intentStats' % (ONOS_IP, ONOS_PORT))
         if 'statistics' not in reply:
             return
         self.add_stats(reply['statistics'])
