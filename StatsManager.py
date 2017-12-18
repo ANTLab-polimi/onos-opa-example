@@ -4,6 +4,7 @@ from pprint import pprint
 import logging
 from utils import bps_to_human_string
 
+
 class StatsManager(object):
     def __init__(self, verbose=False):
         self.last_stat = {}
@@ -35,7 +36,7 @@ class StatsManager(object):
                                 (flow_id in filtered_stats and stat['life'] > filtered_stats[flow_id]['life']):
                             filtered_stats[flow_id] = stat
 
-        # For each flow we check if a stat related to a previous polling round is already available
+        # For each flow we check if a stat related to a previous polling round is available
         for flow_id, stat in filtered_stats.items():
             if flow_id in self.last_stat:
                 bitrate = self.bitrate(self.last_stat[flow_id], stat)
