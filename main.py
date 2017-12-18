@@ -70,14 +70,10 @@ if __name__ == "__main__":
 
     topoManager = TopoManager()
     # topoManager.draw_topo()
-
     statsManager = StatsManager(verbose)
-
     imrManager = IMRManager(verbose)
 
     reroute_event = threading.Event()
-
-    kill_threads = [False]
 
     pollingThread = PollingThread()
     reroutingThread = ReroutingThread()
@@ -85,9 +81,7 @@ if __name__ == "__main__":
     reroutingThread.start()
 
     logging.info('Press any key to exit')
-
     raw_input('')
-
     logging.info('Killing all the threads...')
     pollingThread.stop()
     reroutingThread.stop()
