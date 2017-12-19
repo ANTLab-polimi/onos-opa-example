@@ -18,8 +18,25 @@ $ cd ~
 $ git clone -b imr https://github.com/ANTLab-polimi/onos.git
 $ git clone https://github.com/ANTLab-polimi/onos-opa-example.git
 ```
+Install networkx and matplotlib libraries
 
-Configure your ~/.bashrc file by adding
+```bash
+$ cd ~/onos-opa-example
+$ sudo pip install -r requirements.txt
+$ sudo apt-get install python-tk
+```
+Install JDK
+```bash
+sudo apt install openjdk-8-jdk
+```
+
+Configure your ~/.bashrc file with
+
+```bash
+nano ~/.bashrc
+```
+
+by adding
 
 ```bash
 export ONOS_ROOT=~/onos
@@ -33,7 +50,8 @@ $ source ~/.bashrc
 
 Now build ONOS with the following command
 ```bash
-$ $ONOS_ROOT/tools/build/onos-buck run onos-local -- clean debug
+$ cd $ONOS_ROOT
+$ tools/build/onos-buck run onos-local -- clean debug
 ```
 From another terminal we create a small Mininet topology
 ```bash
@@ -55,7 +73,10 @@ mininet> h2 iperf -c 10.0.0.4 -t 600 &
 ```
 From the GUI http://localhost:8181/onos/ui/index.html we can verify that the IFWD appilcation established connectivity using shortest paths by pressing (A) key.
 
-Without modifying the IFWD application we can now ask the monitoring and rerouting of all the intents it has submitted
+\[IMG\]
+
+Without modifying the IFWD application we can now ask the monitoring and rerouting of all the intents it has submitted.
+(The appID value might differ from 109, but you can use the  Tab Key to autocomplete CLI commands)
 ```bash
 onos> imr:startmon 109 org.onosproject.ifwd
 ```
@@ -69,11 +90,25 @@ The rerouting logic is a simple greedy algorithm which collect TM data for 3 pol
 From the GUI we can verify that, after 3 polling cycles, OPA has modified the routings.
 Some intents has been relocated and this improves the performance of the 2 iperf sessions.
 
+\[IMG\]
+
 While OPA is able to reroute intents via IMR, it does not limit the effectiveness of the Intent Framework in recovering from failues.
 ```bash
 mininet> sh ifconfig s1-eth down
 ```
+# CLI API
+
+IMR service adds two CLI commands to start/stop the monitoring of all the intents (or a specific one) submitted by an application.
+
+```bash
+onos> imr:startmon [--longkey] appId appName [intentKey]
+onos> imr:stopmon [--longkey] appId appName [intentKey]
+```
+If the optional intentKey argument is omitted, all the intents currently submitted by the application will be monitored/unmonitored.
+The optional --longkey (--l) specifies that intentKey should be treated as LongKey rather than StringKey.
 
 # REST API endpoints and JSON Format
+
+IMR service and OPA can communicate via a REST API
 
 TODO
