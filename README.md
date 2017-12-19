@@ -109,6 +109,130 @@ The optional --longkey (--l) specifies that intentKey should be treated as LongK
 
 # REST API endpoints and JSON Format
 
-IMR service and OPA can communicate via a REST API
+IMR service and OPA can communicate via a REST API.
+There are three main endpoints.
+The first one allows to retrieve, via an HTTP GET, the statistics of all the monitored intents from any application or from a specific application or of a specific monitored intent.
+```
+http://localhost:8181/onos/v1/imr/imr/intentStats
+http://localhost:8181/onos/v1/imr/imr/intentStats/appId/appName
+http://localhost:8181/onos/v1/imr/imr/intentStats/appId/appName/intentKey
+```
+The body of the reply is a JSON message with the following format:
+```json
+{  
+    "statistics":[  
+        {  
+            "id":109,
+            "name":"org.onosproject.ifwd",
+            "intents":[  
+                {  
+                    "00:00:00:00:00:01/None00:00:00:00:00:02/None":[  
+                        {  
+                            "id":"45035999039801587",
+                            "tableId":0,
+                            "appId":"org.onosproject.net.intent",
+                            "groupId":0,
+                            "priority":100,
+                            "timeout":0,
+                            "isPermanent":true,
+                            "deviceId":"of:0000000000000001",
+                            "state":"ADDED",
+                            "life":56,
+                            "packets":0,
+                            "bytes":0,
+                            "liveType":"UNKNOWN",
+                            "lastSeen":1513696955188,
+                            "treatment":{  
+                                "instructions":[  
+                                    {  
+                                        "type":"OUTPUT",
+                                        "port":"4"
+                                    }
+                                ],
+                                "deferred":[  
 
-TODO
+                                ]
+                            },
+                            "selector":{  
+                                "criteria":[  
+                                    {  
+                                        "type":"IN_PORT",
+                                        "port":3
+                                    },
+                                    {  
+                                        "type":"ETH_DST",
+                                        "mac":"00:00:00:00:00:02"
+                                    },
+                                    {  
+                                        "type":"ETH_SRC",
+                                        "mac":"00:00:00:00:00:01"
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
+```
+
+The second one allows to retrieve, via an HTTP GET, the element ids of the endpoints of all the monitored intents from any application or from a specific application or of a specific monitored intent.
+```
+http://localhost:8181/onos/v1/imr/imr/monitoredIntents
+http://localhost:8181/onos/v1/imr/imr/monitoredIntents/appId/appName
+http://localhost:8181/onos/v1/imr/imr/monitoredIntents/appId/appName/intentKey
+```
+The body of the reply is a JSON message with the following format:
+```
+{  
+    "response":[  
+        {  
+            "id":109,
+            "name":"org.onosproject.ifwd",
+            "intents":[  
+                {  
+                    "key":"00:00:00:00:00:01/None00:00:00:00:00:02/None",
+                    "inElements":[  
+                        "00:00:00:00:00:01/None"
+                    ],
+                    "outElements":[  
+                        "00:00:00:00:00:02/None"
+                    ]
+                }
+            ]
+        }
+    ]
+}
+```
+
+The last one allows to enforce, via an HTTP POST, for a specific set of intents a corresponding weighted set of paths, where each path is an ordered sequence of element ids.
+```
+http://localhost:8181/onos/v1/imr/imr/reRouteIntents
+```
+The body of the request is a JSON message with the following format:
+```
+{  
+    "routingList":[  
+        {  
+            "appId":{  
+                "id":109,
+                "name":"org.onosproject.ifwd"
+            },
+            "key":"00:00:00:00:00:01/None00:00:00:00:00:03/None",
+            "paths":[  
+                {  
+                    "path":[  
+                        "00:00:00:00:00:01/None",
+                        "of:0000000000000001",
+                        "of:0000000000000002",
+                        "00:00:00:00:00:03/None"
+                    ],
+                    "weight":1.0
+                }
+            ]
+        }
+    ]
+}
+```
