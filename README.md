@@ -6,11 +6,27 @@ The OPA can re-route those monitored intents based on the collected flow level s
 
 IMR requires little code modification to the ONOS application that wants to take advantage of the OPA: it doesn't affect the way the application submits intents to the Intent Framework, IMR only needs to be aware of which intents the ONOS application wants to expose to the OPA and then it will automatically collect statistics and re-route intents.
 
-# Tutorial
-
+# Install guide
 This repository contains an example of a possible OPA logic to be interconnected with the IMR service.
 
 The onos repository contains ONOS plus Intent Monitor and Reroute (IMR) service and Intent Reactive Forwarding (IFWD) application.
+
+## Pre-requisites
+Download and install VirtualBox.
+Download then Mininet VM [DOWNLOAD](https://github.com/mininet/mininet/releases/download/2.2.2/mininet-2.2.2-170321-ubuntu-14.04.4-server-amd64.zip) and import it in VirtualBox.
+
+Follow the instruction at [INSTRUCTION](https://github.com/mininet/openflow-tutorial/wiki/Set-up-Virtual-Machine), to configure the SSH access to the VM.
+
+Now you can connect to the VM machine and start installing the required softwares:
+```bash
+$ sudo apt-get update
+$ sudo apt-get install -y python-pip python-matplotlib curl unzip
+$ sudo apt-get install software-properties-common -y && \ 
+sudo add-apt-repository ppa:webupd8team/java -y && \ 
+sudo apt-get update && \
+echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | sudo debconf-set-selections && \
+sudo apt-get install oracle-java8-installer oracle-java8-set-default -y
+```
 
 Clone both repository in your home directory
 ```bash
@@ -23,11 +39,6 @@ Install networkx and matplotlib libraries
 ```bash
 $ cd ~/onos-opa-example
 $ sudo pip install -r requirements.txt
-$ sudo apt-get install python-tk
-```
-Install JDK
-```bash
-sudo apt install openjdk-8-jdk
 ```
 
 Configure your ~/.bashrc file with
@@ -48,7 +59,8 @@ and source it
 $ source ~/.bashrc
 ```
 
-Now build ONOS with the following command
+## Tutorial
+Now with the VM just configured, you can build ONOS with the following command
 ```bash
 $ cd $ONOS_ROOT
 $ tools/build/onos-buck run onos-local -- clean debug
@@ -94,7 +106,7 @@ Some intents has been relocated and this improves the performance of the 2 iperf
 
 While OPA is able to reroute intents via IMR, it does not limit the effectiveness of the Intent Framework in recovering from failues.
 ```bash
-mininet> sh ifconfig s1-eth down
+mininet> sh ifconfig s1-eth1 down
 ```
 # CLI API
 
