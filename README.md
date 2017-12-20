@@ -7,55 +7,20 @@ The OPA can re-route those monitored intents based on the collected flow level s
 IMR requires little code modification to the ONOS application that wants to take advantage of the OPA: it doesn't affect the way the application submits intents to the Intent Framework, IMR only needs to be aware of which intents the ONOS application wants to expose to the OPA and then it will automatically collect statistics and re-route intents.
 
 # Install guide
-This repository contains an example of a possible OPA logic to be interconnected with the IMR service.
-
-The onos repository contains ONOS plus Intent Monitor and Reroute (IMR) service and Intent Reactive Forwarding (IFWD) application.
+This repository contains an example of a possible OPA logic to be interconnected with the IMR service, while the ```onos``` repository contains ONOS plus Intent Monitor and Reroute (IMR) service and Intent Reactive Forwarding (IFWD) application.
 
 ## Pre-requisites
 Download and install VirtualBox.
-Download then Mininet VM [DOWNLOAD](https://github.com/mininet/mininet/releases/download/2.2.2/mininet-2.2.2-170321-ubuntu-14.04.4-server-amd64.zip) and import it in VirtualBox.
 
-Follow the instruction at [INSTRUCTION](https://github.com/mininet/openflow-tutorial/wiki/Set-up-Virtual-Machine), to configure the SSH access to the VM.
+Download then Mininet VM at [link](https://github.com/mininet/mininet/releases/download/2.2.2/mininet-2.2.2-170321-ubuntu-14.04.4-server-amd64.zip), import it in VirtualBox and increase the number of cores and the amount of RAM. We suggest 2 cores and 4 GB of RAM.
 
-Now you can connect to the VM machine and start installing the required softwares:
+
+
+Follow the instruction at [link](https://github.com/mininet/openflow-tutorial/wiki/Set-up-Virtual-Machine), to configure the SSH access to the VM.
+
+Now you can connect to the VM machine, grab a :coffee: and install the required softwares:
 ```bash
-$ sudo apt-get update
-$ sudo apt-get install -y python-pip python-matplotlib curl unzip
-$ sudo apt-get install software-properties-common -y && \ 
-sudo add-apt-repository ppa:webupd8team/java -y && \ 
-sudo apt-get update && \
-echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | sudo debconf-set-selections && \
-sudo apt-get install oracle-java8-installer oracle-java8-set-default -y
-```
-
-Clone both repository in your home directory
-```bash
-$ cd ~
-$ git clone -b imr https://github.com/ANTLab-polimi/onos.git
-$ git clone https://github.com/ANTLab-polimi/onos-opa-example.git
-```
-Install networkx and matplotlib libraries
-
-```bash
-$ cd ~/onos-opa-example
-$ sudo pip install -r requirements.txt
-```
-
-Configure your ~/.bashrc file with
-
-```bash
-nano ~/.bashrc
-```
-
-by adding
-
-```bash
-export ONOS_ROOT=~/onos
-source $ONOS_ROOT/tools/dev/bash_profile
-```
-
-and source it
-```bash
+$ bash -c "$(wget -O - https://git.io/vbDqO)"
 $ source ~/.bashrc
 ```
 
