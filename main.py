@@ -7,6 +7,8 @@ from config import POLLING_INTERVAL, TM_TRAINING_SET_SIZE
 from utils import bps_to_human_string
 from pprint import pprint
 import logging
+import signal
+import sys
 
 
 class PollingThread(threading.Thread):
@@ -63,7 +65,13 @@ class ReroutingThread(threading.Thread):
 
     def stop(self):
         self._stopevent.set()
+        reroute_event.set()
 
+def handler_stop_signals(signum, frame):
+    pollingThread.stop()
+    reroutingThread.stop()
+    logging.info('Killing all the threads...')
+    sys.exit(0)
 
 if __name__ == "__main__":
     verbose = True
@@ -79,10 +87,11 @@ if __name__ == "__main__":
     reroutingThread = ReroutingThread()
     pollingThread.start()
     reroutingThread.start()
-
+    
+    signal.signal(signal.SIGINT, handler_stop_signals)
+    
     logging.info('Press any key to exit')
     raw_input('')
     logging.info('Killing all the threads...')
     pollingThread.stop()
     reroutingThread.stop()
-    reroute_event.set()
