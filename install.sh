@@ -5,7 +5,7 @@ set -e
 set -o nounset
 
 function install-prereq {
-    sudo apt-get install -y python-pip python-matplotlib curl unzip
+    sudo apt-get install -y python-pip python-matplotlib curl unzip zip
     sudo apt-get install software-properties-common -y
     sudo add-apt-repository ppa:webupd8team/java -y
     sudo apt-get update
@@ -16,14 +16,14 @@ function install-prereq {
 function download-onos {
     cd ~
     git clone -b imr https://github.com/ANTLab-polimi/onos.git
-    echo "export ONOS_ROOT=~/onos" >> ~/.bashrc 
-    echo  "source \$ONOS_ROOT/tools/dev/bash_profile" >> ~/.bashrc 
-    source ~/.bashrc
+    echo "export ONOS_ROOT=~/onos" >> ~/.bashrc
+    echo  "source \$ONOS_ROOT/tools/dev/bash_profile" >> ~/.bashrc
+    echo  "export JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF8" >> ~/.bashrc
 }
 
 function download-onos-opa {
     cd ~
-    git clone git clone https://github.com/ANTLab-polimi/onos-opa-example.git
+    git clone https://github.com/ANTLab-polimi/onos-opa-example.git
     cd ~/onos-opa-example
     sudo pip install -r requirements.txt
 }
