@@ -7,23 +7,16 @@ The OPA can re-route those monitored intents based on the collected flow level s
 IMR requires little code modification to the ONOS application that wants to take advantage of the OPA: it doesn't affect the way the application submits intents to the Intent Framework, IMR only needs to be aware of which intents the ONOS application wants to expose to the OPA and then it will automatically collect statistics and re-route intents.
 
 # Install guide
-This repository contains an example of a possible OPA logic to be interconnected with the IMR service, while the ```onos``` repository contains ONOS plus Intent Monitor and Reroute (IMR) service and Intent Reactive Forwarding (IFWD) application.
+This repository contains an example of a possible OPA logic to be interconnected with the IMR service, while the ```onos``` repository contains, in addition to ONOS, the new Intent Monitor and Reroute (IMR) service and Intent Reactive Forwarding (IFWD) application.
 
 ## Pre-requisites
-Download and install VirtualBox.
+Download Virtual Box and import the pre-configured VM at [link](https://bit.ly/onos-imr).
 
-Download then Mininet VM at [link](https://github.com/mininet/mininet/releases/download/2.2.2/mininet-2.2.2-170321-ubuntu-14.04.4-server-amd64.zip), import it in VirtualBox and increase the number of cores and the amount of RAM. We suggest 2 cores and 4 GB of RAM.
-
-
-
-Follow the instruction at [link](https://github.com/mininet/openflow-tutorial/wiki/Set-up-Virtual-Machine), to configure the SSH access to the VM.
-
-Now you can connect to the VM machine, grab a :coffee: and install the required softwares:
+As an alternative, you can manually install Mininet 2.2.2 on Ubuntu (64 bit) and run the following command to install the pre-requisites and clone the repositories:
 ```bash
 $ bash -c "$(wget -O - https://git.io/vbDqO)"
 $ source ~/.bashrc
 ```
-
 ## Tutorial
 Now with the VM just configured, you can build ONOS with the following command
 ```bash
@@ -48,7 +41,7 @@ mininet> h4 iperf -s &
 mininet> h1 iperf -c 10.0.0.3 -t 600 &
 mininet> h2 iperf -c 10.0.0.4 -t 600 &
 ```
-From the GUI http://localhost:8181/onos/ui/index.html we can verify that the IFWD appilcation established connectivity using shortest paths by pressing (A) key.
+From the GUI at http://[VM_IP]:8181/onos/ui/index.html we can verify that the IFWD appilcation established connectivity using shortest paths by pressing (A) key.
 
 \[IMG\]
 
