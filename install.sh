@@ -15,6 +15,7 @@ function install-prereq {
 
 function download-onos {
     cd ~
+    rm -rf onos
     git clone -b imr https://github.com/ANTLab-polimi/onos.git
     echo "export ONOS_ROOT=~/onos" >> ~/.bashrc
     echo  "source \$ONOS_ROOT/tools/dev/bash_profile" >> ~/.bashrc
