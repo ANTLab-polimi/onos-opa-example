@@ -43,7 +43,7 @@ mininet> h2 iperf -c 10.0.0.4 -t 600 &
 ```
 Connect to the GUI at http://[VM_IP]:8181/onos/ui/index.html (credentials are onos/rocks) and verify that the IFWD appilcation established connectivity using shortest paths by pressing (A) key.
 
-\[IMG\]
+<img src="https://raw.githubusercontent.com/ANTLab-polimi/onos-opa-example/master/img/1.png" width="500">
 
 Without modifying the IFWD application we can now ask the monitoring and rerouting of all the intents it has submitted.
 (The appID value might differ from 109, but you can use the  Tab Key to autocomplete CLI commands)
@@ -60,7 +60,7 @@ The rerouting logic is a simple greedy algorithm which collect TM data for 3 pol
 From the GUI we can verify that, after 3 polling cycles, OPA has modified the routings.
 Some intents has been relocated and this improves the performance of the 2 iperf sessions.
 
-\[IMG\]
+<img src="https://raw.githubusercontent.com/ANTLab-polimi/onos-opa-example/master/img/2.png" width="500">
 
 While OPA is able to reroute intents via IMR, it does not limit the effectiveness of the Intent Framework in recovering from failues.
 ```bash
