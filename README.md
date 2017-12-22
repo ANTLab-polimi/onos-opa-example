@@ -41,7 +41,7 @@ mininet> h4 iperf -s &
 mininet> h1 iperf -c 10.0.0.3 -t 600 &
 mininet> h2 iperf -c 10.0.0.4 -t 600 &
 ```
-From the GUI at http://[VM_IP]:8181/onos/ui/index.html we can verify that the IFWD appilcation established connectivity using shortest paths by pressing (A) key.
+Connect to the GUI at http://[VM_IP]:8181/onos/ui/index.html (credentials are onos/rocks) and verify that the IFWD appilcation established connectivity using shortest paths by pressing (A) key.
 
 \[IMG\]
 
