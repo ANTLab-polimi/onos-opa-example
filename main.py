@@ -3,7 +3,7 @@ import time
 from IMRManager import IMRManager
 from StatsManager import StatsManager
 from TopoManager import TopoManager
-from config import POLLING_INTERVAL, TM_TRAINING_SET_SIZE
+from config import POLLING_INTERVAL, TM_TRAINING_SET_SIZE, VERBOSE
 from utils import bps_to_human_string
 from pprint import pprint
 import logging
@@ -54,10 +54,10 @@ class ReroutingThread(threading.Thread):
                         for intentKey in monitored_intents}
 
             if set(sum([tm.keys() for tm in tm_list], [])) != monitored_intents:
-                if verbose:
+                if VERBOSE:
                     print 'Some tm samples, related to intents which are no longer monitored, have been ignored...'
 
-            if verbose:
+            if VERBOSE:
                 print 'worst_tm'
                 pprint({flow_id: bps_to_human_string(worst_tm[flow_id]) for flow_id in worst_tm})
 
@@ -74,12 +74,10 @@ def handler_stop_signals(signum, frame):
     sys.exit(0)
 
 if __name__ == "__main__":
-    verbose = True
-
     topoManager = TopoManager()
     # topoManager.draw_topo()
-    statsManager = StatsManager(verbose)
-    imrManager = IMRManager(verbose)
+    statsManager = StatsManager()
+    imrManager = IMRManager()
 
     reroute_event = threading.Event()
 
@@ -87,9 +85,9 @@ if __name__ == "__main__":
     reroutingThread = ReroutingThread()
     pollingThread.start()
     reroutingThread.start()
-    
+
     signal.signal(signal.SIGINT, handler_stop_signals)
-    
+
     logging.info('Press any key to exit')
     raw_input('')
     logging.info('Killing all the threads...')

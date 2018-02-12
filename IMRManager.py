@@ -1,13 +1,13 @@
 import json
 import networkx as nx
-from config import ONOS_IP, ONOS_PORT
+from config import ONOS_IP, ONOS_PORT, VERBOSE
 from utils import json_get_req, json_post_req, bps_to_human_string
 from pprint import pprint
 import logging
 
 
 class IMRManager(object):
-    def __init__(self, verbose=False):
+    def __init__(self, verbose=VERBOSE):
         self.intentKey_to_inOutElements = {}
         self.verbose = verbose
         self.retrieve_monitored_intents_from_ONOS()

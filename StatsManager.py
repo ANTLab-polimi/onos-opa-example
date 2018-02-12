@@ -6,7 +6,7 @@ from utils import bps_to_human_string
 
 
 class StatsManager(object):
-    def __init__(self, verbose=False):
+    def __init__(self, verbose=VERBOSE):
         self.last_stat = {}
         self.tm_store = []
         self.verbose = verbose
