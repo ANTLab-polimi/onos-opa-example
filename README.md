@@ -8,7 +8,7 @@ IMR requires little code modification to the ONOS application that wants to take
 This repository contains an example of a possible Off-Platform Application (OPA) logic to be interconnected with the new Intent Monitor and Reroute (IMR) service.
 In this tutorial we are going to create a simple topology and two pairs of intents using the Intent Reactive Forwarding (IFWD) application. We'll then require the IMR service to monitor their statistics and to expose the data to the OPA which in turn will re-reroute the paths.
 
-##Pre-requisites
+## Pre-requisites
 
 This tutorial requires an Ubuntu 16.04.3 (64 bit) Server distribution: we suggest a dedicated VM with 4-8 GB of RAM and 20 GB of storage.
 If you already have a working ONOS installation on your machine, you can jump to the “Download IMR service” step, otherwise keep following these instructions.
@@ -95,7 +95,7 @@ cd $ONOS_ROOT
 git apply ../onos-opa-example/misc/p2pintent-suggested-path.patch
 ```
 
-##Tutorial
+## Tutorial
 
 Start ONOS controller
 ```
