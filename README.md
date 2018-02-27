@@ -1,80 +1,154 @@
 # onos-opa-example
-
 Intent Monitor and Reroute (IMR) service offers ONOS applications and users the possibility to expose statistics and re-routing capabilities, of specific intents, to external Off-Platform Application (OPA).
-
 The OPA can re-route those monitored intents based on the collected flow level statistics optimizing a global network objective.
+
 
 IMR requires little code modification to the ONOS application that wants to take advantage of the OPA: it doesn't affect the way the application submits intents to the Intent Framework, IMR only needs to be aware of which intents the ONOS application wants to expose to the OPA and then it will automatically collect statistics and re-route intents.
 
-# Install guide
-This repository, ```onos-opa-example```, contains an example of a possible OPA logic to be interconnected with the IMR service, while the ```onos``` repository contains, in addition to ONOS, the new Intent Monitor and Reroute (IMR) service and the legacy Intent Reactive Forwarding (IFWD) application.
+This repository contains an example of a possible Off-Platform Application (OPA) logic to be interconnected with the new Intent Monitor and Reroute (IMR) service.
+In this tutorial we are going to create a simple topology and two pairs of intents using the Intent Reactive Forwarding (IFWD) application. We'll then require the IMR service to monitor their statistics and to expose the data to the OPA which in turn will re-reroute the paths.
 
-In this tuorial we are going to create a simple topology and two pairs of intents using the Intent Reactive Forwarding application. We'll then require to the IMR service to monitor their statistics and to expose the data to the OPA which in turn will re-reoute the paths. 
+##Pre-requisites
 
+This tutorial requires an Ubuntu 16.04.3 (64 bit) Server distribution: we suggest a dedicated VM with 4-8 GB of RAM and 20 GB of storage.
+If you already have a working ONOS installation on your machine, you can jump to the “Download IMR service” step, otherwise keep following these instructions.
 
-## Pre-requisites
-Download Virtual Box and import the pre-configured VM at [link](https://bit.ly/onos-imr).
+You can manually install all the pre-requisites or just run an automatic script  and then jump right to "Tutorial" section.
 
-As an alternative, you can manually install Mininet 2.2.2 on Ubuntu (64 bit) and run the following command to install the pre-requisites and clone the two repositories:
-```bash
-$ bash -c "$(wget -O - https://git.io/vbDqO)"
-$ source ~/.bashrc
+### Automatic installation (recommended)
 ```
-## Tutorial
+bash -c "$(wget -O - https://git.io/vAPer)"
+source ~/.bashrc
+```
 
-Now, with the VM just configured, you can build ONOS with the following command
-```bash
-$ cd $ONOS_ROOT
-$ tools/build/onos-buck run onos-local -- clean debug
+### Manual installation
+
+Open a terminal and install Java 8
 ```
-From another terminal we create a small Mininet topology
-```bash
-$ cd ~/onos-opa-example/topo
-$ sudo python topo.py
+sudo apt-get update && \
+sudo apt-get install git python python-pip python-matplotlib curl unzip zip software-properties-common -y && \
+sudo add-apt-repository ppa:webupd8team/java -y && \
+sudo apt-get update && \
+echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | sudo debconf-set-selections && \
+sudo apt-get install oracle-java8-installer oracle-java8-set-default -y
 ```
-From another terminal let's connect to the ONOS CLI to disable the Reactive Forwarding application and to enable Intent Reactive Forwarding and Intent Monitor And Reroute applications
-```bash
-$ onos localhost
-onos> app deactivate org.onosproject.fwd
-onos> app activate org.onosproject.ifwd org.onosproject.imr
+Install Apache Maven 3.3.9
+```
+cd /usr/local
+sudo wget http://archive.apache.org/dist/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz
+sudo tar xzf apache-maven-3.3.9-bin.tar.gz
+echo "export M2_HOME=/usr/local/apache-maven-3.3.9/" >> ~/.bashrc
+echo "export MAVEN_HOME=/usr/local/apache-maven-3.3.9/" >> ~/.bashrc
+echo "export PATH=\${M2_HOME}/bin:${PATH}" >> ~/.bashrc
+source ~/.bashrc
+sudo rm -f apache-maven-3.3.9-bin.tar.gz
+```
+
+Install Mininet
+```
+cd --
+git clone git://github.com/mininet/mininet
+sudo mininet/util/install.sh -a
+```
+
+Clone the onos repository
+```
+cd --
+git clone https://gerrit.onosproject.org/onos 
+
+echo "export ONOS_ROOT=~/onos" >> ~/.bashrc
+echo  "source \$ONOS_ROOT/tools/dev/bash_profile" >> ~/.bashrc
+source ~/.bashrc
+```
+Download the IMR service (NB this step will not be required once IMR service is integrated in ONOS codebase)
+```
+cd $ONOS_ROOT
+git fetch https://gerrit.onosproject.org/onos refs/changes/34/16234/7 && git checkout FETCH_HEAD
+```
+
+Build ONOS
+
+```
+cd $ONOS_ROOT
+tools/build/onos-buck build onos --show-output
+```
+
+Download and install IFWD application
+```
+cd --
+git clone -b ifwd-p2p-intents https://github.com/ANTLab-polimi/onos-app-samples
+cd onos-app-samples/ifwd
+mvn clean install
+```
+
+Download the example OPA
+```
+cd --
+git clone https://github.com/ANTLab-polimi/onos-opa-example.git
+cd onos-opa-example
+sudo pip install -r requirements.txt
+```
+
+Patch ONOS's PointToPointIntent to include suggested paths (NB this step will not be required once Gerrit Patch #16569 is integrated in ONOS codebase)
+```
+cd $ONOS_ROOT
+git apply ../onos-opa-example/misc/p2pintent-suggested-path.patch
+```
+
+##Tutorial
+
+Start ONOS controller
+```
+cd $ONOS_ROOT
+tools/build/onos-buck run onos-local -- clean debug
+```
+Once ONOS is ready, from another terminal deactivate the FWD application and enable IMR service
+```
+cd ~/onos-app-samples
+onos-app localhost deactivate org.onosproject.fwd
+onos-app localhost activate org.onosproject.imr
+```
+Then install and activate IFWD application
+```
+onos-app localhost install! ./ifwd/target/onos-app-ifwd-1.9.0-SNAPSHOT.oar
+```
+Create a simple Mininet topology
+```
+cd ~/onos-opa-example/topo
+sudo python topo.py
 ```
 Let's start 2 iperf sessions from h1 to h3 and from h2 to h4.
-```bash
+```
 mininet> h3 iperf -s &
 mininet> h4 iperf -s &
 mininet> h1 iperf -c 10.0.0.3 -t 600 &
 mininet> h2 iperf -c 10.0.0.4 -t 600 &
 ```
-Connect to the GUI at http://[VM_IP]:8181/onos/ui/index.html (credentials are onos/rocks) and verify that the IFWD appilcation established connectivity using shortest paths by pressing (A) key.
+Connect to the GUI at http://[VM_IP]:8181/onos/ui/index.html (credentials are onos/rocks) and verify that the IFWD application established connectivity using shortest paths by pressing (A) key.
 
 <img src="https://raw.githubusercontent.com/ANTLab-polimi/onos-opa-example/master/img/1.png" width="500">
 
-Without modifying the IFWD application, we can now require the monitoring and rerouting of all the intents it has submitted using the following CLI command.
-(The appID value might differ from 109, but you can use the  Tab Key to autocomplete CLI commands)
-```bash
-onos> imr:startmon 109 org.onosproject.ifwd
+Without modifying the IFWD application, we can now require the monitoring and rerouting of all the intents it has submitted using the following CLI command from another terminal. (The appID value might differ from 161, but you can use the Tab Key to autocomplete CLI commands)
 ```
-Finally we can start the OPA:
-```bash
-$ cd ~/onos-opa-example
-$ python main_one_shot.py
+onos localhost
+onos> imr:startmon 161 org.onosproject.ifwd
+onos> logout
+```
+Finally we can start the OPA
+```
+cd ~/onos-opa-example
+python main_one_shot.py
 ```
 
 The rerouting logic is a simple greedy algorithm which collects one Traffic Matrix (TM) and iteratively select for each demand (sorted in descending order) the shortest path on the capacitated residual graph.
-
-From the GUI we can verify that, after 2 polling cycles, OPA has modified the routings.
-Some intents has been relocated and this improves the performance of the 2 iperf sessions.
+From the GUI we can verify that, after 2 polling cycles, OPA has modified the routings. Some intents has been relocated and this improves the performance of the 2 iperf sessions.
 
 <img src="https://raw.githubusercontent.com/ANTLab-polimi/onos-opa-example/master/img/2.png" width="500">
 
-While OPA is able to reroute intents via IMR, it does not limit the effectiveness of the Intent Framework in recovering from failues*.
-
-
-```bash
+While OPA is able to reroute intents via IMR, it does not limit the effectiveness of the Intent Framework in recovering from failures.
+```
 mininet> sh ifconfig s1-eth1 down
 ```
-
-*This features is currently available only in this ``onos`` repository. If you are testing IMR service using ONOS Gerrit patch [#16234](https://gerrit.onosproject.org/#/c/16234/), you need to integrate also modifications from patch [#16569](https://gerrit.onosproject.org/#/c/16569/).
 
 ### Tutorial (2)
 
@@ -230,3 +304,4 @@ The body of the request is a JSON message with the following format:
     ]
 }
 ```
+
