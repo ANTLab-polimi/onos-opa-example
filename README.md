@@ -8,6 +8,9 @@ IMR requires little code modification to the ONOS application that wants to take
 This repository contains an example of a possible Off-Platform Application (OPA) logic to be interconnected with the new Intent Monitor and Reroute (IMR) service.
 In this tutorial we are going to create a simple topology and two pairs of intents using the Intent Reactive Forwarding (IFWD) application. We'll then require the IMR service to monitor their statistics and to expose the data to the OPA which in turn will re-reroute the paths.
 
+## Publications
+* D. Sanvito, D. Moro, M. Gullì, I. Filippini, A. Capone and A. Campanella, "ONOS Intent Monitor and Reroute service: enabling plug&play routing logic," 2018 4th IEEE Conference on Network Softwarization and Workshops (NetSoft), 2018. [Available at IEEE Xplore](https://ieeexplore.ieee.org/abstract/document/8460064)
+
 ## Pre-requisites
 
 This tutorial requires an Ubuntu 16.04.3 (64 bit) Server distribution: we suggest a dedicated VM with 4-8 GB of RAM and 20 GB of storage.
