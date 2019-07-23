@@ -9,7 +9,8 @@ This repository contains an example of a possible Off-Platform Application (OPA)
 In this tutorial we are going to create a simple topology and two pairs of intents using the Intent Reactive Forwarding (IFWD) application. We'll then require the IMR service to monitor their statistics and to expose the data to the OPA which in turn will re-reroute the paths.
 
 ## Publications
-* D. Sanvito, D. Moro, M. Gullì, I. Filippini, A. Capone and A. Campanella, "ONOS Intent Monitor and Reroute service: enabling plug&play routing logic," 2018 4th IEEE Conference on Network Softwarization and Workshops (NetSoft), 2018. [Available at IEEE Xplore](https://ieeexplore.ieee.org/abstract/document/8460064)
+* D. Sanvito, D. Moro, M. Gullì, I. Filippini, A. Capone and A. Campanella, "ONOS Intent Monitor and Reroute service: enabling plug&play routing logic," 2018 4th IEEE Conference on Network Softwarization and Workshops (NetSoft), 2018. [Paper available at IEEE Xplore](https://ieeexplore.ieee.org/abstract/document/8460064)
+* D. Sanvito, D. Moro, M. Gullì, I. Filippini, A. Capone and A. Campanella, "Enabling external routing logic in ONOS with Intent Monitor and Reroute service," 2018 4th IEEE Conference on Network Softwarization and Workshops (NetSoft), 2018. [Poster](https://davidesanvito.github.io/pub/2018-06-netsoft-poster.pdf)
 
 ## Pre-requisites
 
@@ -34,6 +35,7 @@ sudo add-apt-repository ppa:webupd8team/java -y && \
 sudo apt-get update && \
 echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | sudo debconf-set-selections && \
 sudo apt-get install oracle-java8-installer oracle-java8-set-default -y
+sudo apt-get install python-minimal openjdk-8-jdk -y
 ```
 Install Apache Maven 3.3.9
 ```
@@ -54,29 +56,40 @@ git clone git://github.com/mininet/mininet
 sudo mininet/util/install.sh -a
 ```
 
+Install Bazel
+```
+cd --
+sudo apt-get install pkg-config zip g++ zlib1g-dev unzip python3 -y
+wget https://github.com/bazelbuild/bazel/releases/download/0.23.2/bazel-0.23.2-installer-linux-x86_64.sh
+chmod +x bazel-0.23.2-installer-linux-x86_64.sh
+./bazel-0.23.2-installer-linux-x86_64.sh --user
+echo "export PATH=\"$PATH:$HOME/bin\"" >> ~/.bashrc
+```
+
 Clone the onos repository
+
+NB IMR is guaranteed to be supported by ONOS v1.15 up to commit 3bc7060466c0d0da72799455ac2eb44048e1bd3d
 ```
 cd --
 git clone https://gerrit.onosproject.org/onos 
+cd onos
+git reset --hard 3bc7060466c0d0da72799455ac2eb44048e1bd3d
 
 echo "export ONOS_ROOT=~/onos" >> ~/.bashrc
 echo  "source \$ONOS_ROOT/tools/dev/bash_profile" >> ~/.bashrc
 source ~/.bashrc
 ```
-Download the IMR service (NB this step will not be required once IMR service is integrated in ONOS codebase)
-```
-cd $ONOS_ROOT
-git fetch https://gerrit.onosproject.org/onos refs/changes/34/16234/7 && git checkout FETCH_HEAD
-```
-
 Build ONOS
 
 ```
 cd $ONOS_ROOT
-tools/build/onos-buck build onos --show-output
+bazel build onos
 ```
 
 Download and install IFWD application
+
+NB IMR currently supports only LinkCollectionIntent and PointToPointIntent.
+We provide a modified IFWD application which sumits PointToPointIntents instead of HostToHostIntents.
 ```
 cd --
 git clone -b ifwd-p2p-intents https://github.com/ANTLab-polimi/onos-app-samples
@@ -92,10 +105,11 @@ cd onos-opa-example
 sudo pip install -r requirements.txt
 ```
 
-Patch ONOS's PointToPointIntent to include suggested paths (NB this step will not be required once Gerrit Patch #16569 is integrated in ONOS codebase)
+Patch IMR to submit PointToPointIntent with suggested path instead of LinkCollectionIntent. This step is required because Gerrit Patch #16569 was not integrated in ONOS when IMR was originally included.
+
 ```
 cd $ONOS_ROOT
-git apply ../onos-opa-example/misc/p2pintent-suggested-path.patch
+git apply ../onos-opa-example/misc/imr-submits-p2pintent-suggested-path.patch
 ```
 
 ## Tutorial
@@ -103,7 +117,7 @@ git apply ../onos-opa-example/misc/p2pintent-suggested-path.patch
 Start ONOS controller
 ```
 cd $ONOS_ROOT
-tools/build/onos-buck run onos-local -- clean debug
+bazel run onos-local -- clean debug
 ```
 Once ONOS is ready, from another terminal deactivate the FWD application and enable IMR service
 ```

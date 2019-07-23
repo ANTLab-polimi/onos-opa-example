@@ -1,0 +1,71 @@
+diff --git a/apps/imr/app/src/main/java/org/onosproject/imr/IntentMonitorAndRerouteManager.java b/apps/imr/app/src/main/java/org/onosproject/imr/IntentMonitorAndRerouteManager.java
+index 9b5d070..ed20b12 100644
+--- a/apps/imr/app/src/main/java/org/onosproject/imr/IntentMonitorAndRerouteManager.java
++++ b/apps/imr/app/src/main/java/org/onosproject/imr/IntentMonitorAndRerouteManager.java
+@@ -238,6 +238,50 @@ public class IntentMonitorAndRerouteManager implements IntentMonitorAndRerouteSe
+ 
+ 
+     /**
++     * Generates a new {@Link PointToPointIntent} applying the new path.
++     * @param links List of links of the new path.
++     * @param intentKey Key of the intent you want to re-route.
++     * @param appId Application id that submits initially the intent.
++     * @return The new intent, if not possibile it will return the old intent already installed.
++     */
++    private ConnectivityIntent generatePointToPointIntent(
++            List<Link> links,
++            Key intentKey,
++            ApplicationId appId) {
++        checkNotNull(links);
++        checkNotNull(appId);
++
++        // Gets the oldIntent already installed
++        ConnectivityIntent oldIntent = monitoredIntents.get(appId).get(intentKey);
++
++        //Flush the statistics of the currently installed intent
++        flushIntentStatStore(intentKey);
++
++        //get the connect point of the old intent
++        // Left element of the Pair is the ingress, right one is the egress
++        Pair<Set<FilteredConnectPoint>, Set<FilteredConnectPoint>> cpPair = extractEndConnectPoints(oldIntent);
++        if (cpPair == null) {
++            return oldIntent;
++        }
++
++        // Now generate the new intent
++        PointToPointIntent newIntent = PointToPointIntent.builder()
++                .appId(oldIntent.appId())
++                .key(intentKey)
++                .selector(oldIntent.selector())
++                //TODO: find an alternative to iterator().next()
++                .filteredIngressPoint(cpPair.getLeft().iterator().next())
++                .filteredEgressPoint(cpPair.getRight().iterator().next())
++                .treatment(oldIntent.treatment())
++                .priority(oldIntent.priority())
++                .constraints(oldIntent.constraints())
++                .suggestedPath(links)
++                .build();
++
++        return newIntent;
++    }
++
++    /**
+      * Generates a new {@Link LinkCollectionIntent} applying the new path.
+      * @param links List of links of the new path.
+      * @param intentKey Key of the intent you want to re-route.
+@@ -319,7 +363,7 @@ public class IntentMonitorAndRerouteManager implements IntentMonitorAndRerouteSe
+         List<Link> links = createPathFromDeviceList(currentPath.path());
+ 
+         // Generate the new Link collection intent, if not possible it will return the old intent
+-        ConnectivityIntent intent = generateLinkCollectionIntent(links, key, appId);
++        ConnectivityIntent intent = generatePointToPointIntent(links, key, appId);
+         storeMonitoredIntent(intent);
+         intentService.submit(intent);
+         return true;
+@@ -642,4 +686,4 @@ public class IntentMonitorAndRerouteManager implements IntentMonitorAndRerouteSe
+             return false;
+         }
+     }
+-}
+\ No newline at end of file
++}

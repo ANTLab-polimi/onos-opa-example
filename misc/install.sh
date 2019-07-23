@@ -14,6 +14,7 @@ function install-prereq {
     sudo apt-get update && \
     echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | sudo debconf-set-selections && \
     sudo apt-get install oracle-java8-installer oracle-java8-set-default -y
+    sudo apt-get install python-minimal openjdk-8-jdk -y
 
     # Install Maven 3.3.9
     cd /usr/local
@@ -25,6 +26,14 @@ function install-prereq {
     source ~/.sfile
     sudo rm -f apache-maven-3.3.9-bin.tar.gz
 
+    # Install Bazel
+    cd --
+    sudo apt-get install pkg-config zip g++ zlib1g-dev unzip python3 -y
+    wget https://github.com/bazelbuild/bazel/releases/download/0.23.2/bazel-0.23.2-installer-linux-x86_64.sh
+    chmod +x bazel-0.23.2-installer-linux-x86_64.sh
+    ./bazel-0.23.2-installer-linux-x86_64.sh --user
+    echo "export PATH=\"$PATH:$HOME/bin\"" >> ~/.sfile
+
     # Install Mininet
     cd --
     git clone git://github.com/mininet/mininet
@@ -34,13 +43,11 @@ function install-prereq {
 function download-onos {
     # Download ONOS
     cd --
-    git clone https://gerrit.onosproject.org/onos 
+    git clone https://gerrit.onosproject.org/onos
+    cd onos
+    git reset --hard 3bc7060466c0d0da72799455ac2eb44048e1bd3d
     echo "export ONOS_ROOT=~/onos" >> ~/.sfile
     source ~/.sfile
-
-    # Download ONOS IMR service
-    cd $ONOS_ROOT
-    git fetch https://gerrit.onosproject.org/onos refs/changes/34/16234/7 && git checkout FETCH_HEAD
 }
 
 function download-onos-ifwd {
@@ -56,9 +63,10 @@ function download-onos-opa {
     cd onos-opa-example
     export LC_ALL=C
     sudo pip install -r requirements.txt
-    # Patching ONOS's PointToPointIntent to include suggested paths
+
+    # Patching IMR to submit PointToPointIntent with suggested paths
     cd $ONOS_ROOT
-    git apply ../onos-opa-example/misc/p2pintent-suggested-path.patch
+    git apply ../onos-opa-example/misc/imr-submits-p2pintent-suggested-path.patch
 }
 
 install-prereq
